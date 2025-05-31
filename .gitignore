@@ -1,0 +1,9 @@
+nations.xml
+nations.db
+bot.db
+api.json
+.env
+telegrams/
+venv/
+reports/
+**/__pycache__/

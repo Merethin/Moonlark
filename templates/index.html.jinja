@@ -1,0 +1,283 @@
+{% extends "base.html.jinja" %}
+{% block title %}Moonlark Report{% endblock %}
+{% block content %}
+<div class="stats shadow flex w-full">
+  <div class="stat">
+    <div class="stat-figure text-secondary">
+    <a class="item group" href="#">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="inline-block h-8 w-8 stroke-current"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <span
+      class="pointer-events-none absolute -top-7 left-0 w-max opacity-0 transition-opacity group-hover:opacity-100">
+      Total recruitment telegrams sent during this time period.
+    </span>
+    </a>
+    </div>
+    <div class="stat-title">Telegrams Sent</div>
+    <div class="stat-value">{{ analytics.stats.delivered|displaynum }}</div>
+    <div class="stat-desc">{{ analytics.timeRange.start|renderdate }} - {{ analytics.timeRange.end|renderdate }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-figure text-secondary">
+    <a class="item group" href="#">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="inline-block h-8 w-8 stroke-current"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <span
+      class="pointer-events-none absolute -top-7 left-0 w-max opacity-0 transition-opacity group-hover:opacity-100">
+      Amount of recruitment telegrams read by recipients.
+    </span>
+    </a>
+    </div>
+    <div class="stat-title">Telegrams Read</div>
+    <div class="stat-value">{{ analytics.stats.readCount|displaynum }}</div>
+    <div class="stat-desc">{{ analytics.stats.readRate }} read rate</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-figure text-secondary">
+    <a class="item group" href="#">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="inline-block h-8 w-8 stroke-current"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <span
+      class="pointer-events-none absolute -top-7 left-0 w-max opacity-0 transition-opacity group-hover:opacity-100">
+      The amount of nations that followed the recruitment telegram to the region.
+    </span>
+    </a>
+    </div>
+    <div class="stat-title">Nations Recruited</div>
+    <div class="stat-value">{{ analytics.stats.recruitCount|displaynum }}</div>
+    <div class="stat-desc">{{ analytics.stats.recruitRate }} conversion rate</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-figure text-secondary">
+    <a class="item group" href="#">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="inline-block h-8 w-8 stroke-current"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <span
+      class="pointer-events-none absolute -top-7 left-0 w-max opacity-0 transition-opacity group-hover:opacity-100">
+      Recruits who are still in the region and have been active recently (in the last 7 days by default).
+    </span>
+    </a>
+    </div>
+    <div class="stat-title">Loyal Recruits</div>
+    <div class="stat-value">{{ analytics.faithfulCount|displaynum }}</div>
+    <div class="stat-desc">{{ analytics.preserveRate }} integration rate</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-figure text-secondary">
+    <a class="item group" href="#">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="inline-block h-8 w-8 stroke-current"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <span
+      class="pointer-events-none absolute -top-7 left-0 w-max opacity-0 transition-opacity group-hover:opacity-100">
+      Recruits that not only are still in the region and have been active recently, but have also joined the WA and remain in it to this day.
+    </span>
+    </a>
+    </div>
+    <div class="stat-title">Loyal WAs</div>
+    <div class="stat-value">{{ analytics.waFaithfulCount|displaynum }}</div>
+    <div class="stat-desc">{{ analytics.waPreserveRate }} WA integration rate</div>
+  </div>
+</div>
+
+<div class="flex w-full">
+<div class="flex-col w-full h-full">
+
+<div tabindex="0" class="collapse collapse-arrow bg-base-100 border-base-300 border">
+  <div class="collapse-title font-semibold">View Template Breakdown</div>
+  <div class="collapse-content text-sm">
+    {% for category, tg in (telegrams|items) %}
+    <div class="card card-border bg-base-100">
+        <div class="card-body">
+            <h2 class="card-title">Template Category: {{ category }}</h2>
+            <div class="stats shadow">
+            <div class="stat">
+                <div class="stat-figure text-secondary">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    class="inline-block h-8 w-8 stroke-current"
+                >
+                    <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                </svg>
+                </div>
+                <div class="stat-title">Telegrams Sent</div>
+                <div class="stat-value">{{ tg.stats.delivered|displaynum }}</div>
+                <div class="stat-desc">{{ tg.timeRange.start|renderdate }} - {{ tg.timeRange.end|renderdate }}</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-figure text-secondary">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    class="inline-block h-8 w-8 stroke-current"
+                >
+                    <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                </svg>
+                </div>
+                <div class="stat-title">Telegrams Read</div>
+                <div class="stat-value">{{ tg.stats.readCount|displaynum }}</div>
+                <div class="stat-desc">{{ tg.stats.readRate }} read rate</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-figure text-secondary">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    class="inline-block h-8 w-8 stroke-current"
+                >
+                    <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                </svg>
+                </div>
+                <div class="stat-title">Nations Recruited</div>
+                <div class="stat-value">{{ tg.stats.recruitCount|displaynum }}</div>
+                <div class="stat-desc">{{ tg.stats.recruitRate }} conversion rate</div>
+            </div>
+            </div>
+            <div class="card-actions justify-end">
+            <a class="btn btn-primary" href="{{ category }}.html">More Details</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div tabindex="0" class="collapse collapse-arrow bg-base-100 border-base-300 border">
+  <div class="collapse-title font-semibold">View Competitors</div>
+  <div class="collapse-content text-sm">
+  <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Region</th>
+        <th>Nations Taken</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for region, count in (analytics.traitor_destinations|sortbyhighest) %}
+      <tr>
+        <th>{{ loop.index }}</th>
+        <td>{{ region }}</th>
+        <td>{{ count }}</td>
+    </tr>
+      {% endfor %}
+    </tbody>
+     </table>
+</div>
+  </div>
+</div>
+
+</div>
+
+<div class="divider divider-horizontal"></div>
+
+<div class="flex-col w-full h-full">
+
+<ul class="list bg-base-100 rounded-box shadow-md">
+  <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Telegrams Sent By Method</li>
+    {% for method in (methods|sortstatsbyhighest) %}            
+  <li class="list-row">
+    <div class="text-4xl font-thin opacity-30 tabular-nums">0{{ loop.index }}</div>
+    <div class="list-col-grow">
+      <div>{{ method[0]|methodname }}</div>
+      <div class="text-xs uppercase font-semibold opacity-60">{{ method[1].delivered|displaynum }} Telegrams Sent</div>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+
+<ul class="list bg-base-100 rounded-box shadow-md">
+  <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Telegrams Sent By Nation</li>
+    {% for nation in (nations|sortstatstop) %}            
+  <li class="list-row">
+    <div class="text-4xl font-thin opacity-30 tabular-nums">0{{ loop.index }}</div>
+    <div class="list-col-grow">
+      <div>{{ nation[0]|canonname }}</div>
+      <div class="text-xs uppercase font-semibold opacity-60">{{ nation[1].delivered|displaynum }} Telegrams Sent</div>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+</div>
+</div>
+{% endblock %}

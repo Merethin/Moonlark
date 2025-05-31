@@ -1,0 +1,48 @@
+{% extends "base.html.jinja" %}
+{% block title %}Moonlark Report: {{ telegram.category }}{% endblock %}
+{% block content %}
+    <div id="template-box">
+        <h1>Telegram Summary for {{ telegram.category }}</h1>
+        <p>Data from {{ telegram.timeRange.start|renderdate }} to {{ telegram.timeRange.end|renderdate }}</p>
+
+        <p>{{ telegram.stats.delivered }} Telegrams Sent</p>
+        <p>{{ telegram.stats.readCount }} Telegrams Read ({{ telegram.stats.readRate }})</p>
+        <p>{{ telegram.stats.recruitCount }} Nations Recruited ({{ telegram.stats.recruitRate }})</p>
+        <p>Read to Recruitment Rate: {{ telegram.stats.readToRecruitRate }}</p>
+
+        <div id="methods-box">
+            <h2>Telegram Breakdown (by Method)</h2>
+            {% for method in (telegram.methods|sortstatsbyhighest) %}
+            <div>
+                <p>{{ method[0]|methodname }}: {{ method[1].delivered }} Sent</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div id="nations-box">
+            <h2>Telegram Breakdown (by Nation)</h2>
+            {% for nation in (telegram.nations|sortstatsbyhighest) %}
+            <div>
+                <p>{{ nation[0]|canonname }}: {{ nation[1].delivered }} Sent</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div id="templates-box">
+            <h2>Telegram Breakdown (by Template)</h2>
+            {% for template in telegram.templates %}
+            <div>
+                <h3>Template ID: {{ template.tgid }}</h3>
+                <p>Type: {{ template.type }}</p>
+                <p>Sent By: {{ template.nation }}</p>
+                <p>Data from {{ template.timeRange.start|renderdate }} to {{ template.timeRange.end|renderdate }}</p>
+
+                <p>{{ template.stats.delivered }} Telegrams Sent</p>
+                <p>{{ template.stats.readCount }} Telegrams Read ({{ template.stats.readRate }})</p>
+                <p>{{ template.stats.recruitCount }} Nations Recruited ({{ template.stats.recruitRate }})</p>
+                <p>Read to Recruitment Rate: {{ telegram.stats.readToRecruitRate }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
