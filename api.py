@@ -70,6 +70,10 @@ async def telegram_loop(event: asyncio.Event):
                 response = await client.get(sans.Telegram(client=config.client, tgid=str(template.tgid), key=template.key, to=nation), auth=limiter)
 
                 print(f"log: telegram {template.tgid} sent to {nation}, response: {response.content.rstrip().decode("utf-8")}")
+
+                print(f"log: delaying next telegram by {RECRUITMENT_DELAY} seconds")
+
+                await asyncio.sleep(RECRUITMENT_DELAY) # sans automatically limits the telegram speed, but we want to pick a nation after the delay's over, not before it
             else:
                 print(f"log: no nations in queue, blocking")
                 event.clear()
