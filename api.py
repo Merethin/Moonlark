@@ -15,7 +15,7 @@ class Config:
     client: str
     templates: dict[str, list[TGTemplate]]
 
-nation_queue = deque(maxlen=100)
+nation_queue = deque(maxlen=8)
 config = Config("", {})
 
 FOUND_REGEX = re.compile(r"@@([a-z0-9_\-]+)@@ was (founded|refounded) in %%([a-z0-9_\-]+)%%")
@@ -66,10 +66,10 @@ async def telegram_loop(event: asyncio.Event):
 
                 template = random.choice(config.templates[category])
 
-                print(f"log: dispatching telegram with ID {template.tgid} (category: {category}) to target '{nation}'")
+                print(f"log: preparing telegram with ID {template.tgid} (category: {category}) for target '{nation}'")
                 response = await client.get(sans.Telegram(client=config.client, tgid=str(template.tgid), key=template.key, to=nation), auth=limiter)
 
-                print(f"log: telegram sent, response: {response.content.rstrip().decode("utf-8")}")
+                print(f"log: telegram {template.tgid} sent to {nation}, response: {response.content.rstrip().decode("utf-8")}")
             else:
                 print(f"log: no nations in queue, blocking")
                 event.clear()

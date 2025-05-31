@@ -6,7 +6,8 @@ from .guilds import GuildManager
 import typing, discord, asyncio, random
 from datetime import datetime
 
-BACKLOG_SIZE = 400
+WA_BACKLOG_SIZE = 8
+BACKLOG_SIZE = 16
 MAX_NATIONS_PER_TG = 8
 
 class RecruiterView(discord.ui.View):
@@ -39,7 +40,7 @@ class RecruitmentManager(commands.Cog):
         for guild in self.bot.guilds:
             print(f"Updating backlog queues for guild {guild.name}")
             if guild.id not in self.wa_queue.keys():
-                self.wa_queue[guild.id] = deque(maxlen=BACKLOG_SIZE)
+                self.wa_queue[guild.id] = deque(maxlen=WA_BACKLOG_SIZE)
             if guild.id not in self.newfound_queue.keys():
                 self.newfound_queue[guild.id] = deque(maxlen=BACKLOG_SIZE)
             if guild.id not in self.refound_queue.keys():
@@ -61,7 +62,7 @@ class RecruitmentManager(commands.Cog):
         result = []
         queue = self.wa_queue.get(guild)
         if queue is None:
-            queue = deque(maxlen=BACKLOG_SIZE)
+            queue = deque(maxlen=WA_BACKLOG_SIZE)
             self.wa_queue[guild] = queue
 
         for i in range(max):

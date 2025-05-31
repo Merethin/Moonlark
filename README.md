@@ -129,6 +129,6 @@ After a _while_, both HTML and JSON will be generated in the output folder. The 
 
 ### To-do/Unimplemented
 
-- Figure out why telegram sending on API with sans hangs sometimes/often
+- Implement puppet filtering
 
 - Polish up the reports, especially the UI, and include additional data
