@@ -55,7 +55,7 @@ RECRUITMENT_DELAY = 180
 
 async def telegram_loop(event: asyncio.Event):
     limiter = sans.TelegramLimiter(recruitment=True)
-    timeout = httpx.Timeout(10.0, read_timeout=None)
+    timeout = httpx.Timeout(10.0, read=None)
 
     async with sans.AsyncClient() as client:
         while True:
