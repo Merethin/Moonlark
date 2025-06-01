@@ -16,10 +16,30 @@ class Config:
     templates: dict[str, list[TGTemplate]]
 
 nation_queue = deque(maxlen=8)
+filter_queue = deque(maxlen=40)
 config = Config("", {})
 
 FOUND_REGEX = re.compile(r"@@([a-z0-9_\-]+)@@ was (founded|refounded) in %%([a-z0-9_\-]+)%%")
 WA_JOIN_REGEX = re.compile(r"@@([a-z0-9_\-]+)@@ was admitted to the World Assembly")
+
+def check_puppet_filter(nation: str) -> bool:
+    puppet_likeliness = 0
+    for other_nation in filter_queue:
+        i = 0
+        for (a, b) in zip(nation,other_nation):
+            if a != b:
+                break
+            else:
+                i += 1
+        if i/len(nation) > puppet_likeliness:
+            puppet_likeliness = i/len(nation)
+
+    if puppet_likeliness < 0.6:
+        filter_queue.append(nation)
+        return False
+    else:
+        print("Skipping likely puppet: {} is {} similar to existing nation".format(nation,puppet_likeliness))
+        return True
 
 async def sse_loop(asyncio_event: asyncio.Event):
     client = sans.AsyncClient()
@@ -29,6 +49,9 @@ async def sse_loop(asyncio_event: asyncio.Event):
         if match is not None:
             groups = match.groups()
             nation = groups[0]
+
+            if check_puppet_filter(nation):
+                continue
 
             if groups[1] == 'founded':
                 nation_queue.append(('newfound', nation))
@@ -44,6 +67,10 @@ async def sse_loop(asyncio_event: asyncio.Event):
         if match is not None:
             groups = match.groups()
             nation = groups[0]
+
+            if check_puppet_filter(nation):
+                continue
+
             nation_queue.append(('wa', nation))
 
             asyncio_event.set()

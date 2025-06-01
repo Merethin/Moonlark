@@ -20,6 +20,9 @@ class NationListener(commands.Cog):
                 groups = match.groups()
                 nation = groups[0]
 
+                if recruiter.check_puppet_filter(nation):
+                    continue
+
                 if groups[1] == 'founded':
                     recruiter.add_newfound(nation)
                 else:
@@ -34,6 +37,10 @@ class NationListener(commands.Cog):
             if match is not None:
                 groups = match.groups()
                 nation = groups[0]
+                
+                if recruiter.check_puppet_filter(nation):
+                    continue
+
                 recruiter.add_new_wa(nation)
 
                 self.bot.dispatch('new_recruit', nation)

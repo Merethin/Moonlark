@@ -16,7 +16,7 @@ Must be no ordinary bird, then...
 Welcome to <b>Moonlark</b> - the bird that delivers your NationStates recruitment telegrams.</p>
 
 <p style="text-align: center;">
-<b>Moonlark</b> is an all-in-one suite for NS recruitment - including two recruitment clients, one API script and one Discord bot for manual telegramming - both powered by server-sent events to deliver your telegrams almost as soon as nations are founded.
+<b>Moonlark</b> is an all-in-one suite for NS recruitment - including two recruitment clients, one API script and one Discord bot for manual telegramming - both powered by server-sent events to deliver your telegrams almost as soon as nations are founded, with puppet filtering so that you can telegram the nations that actually matter.
 </p>
 
 <p style="text-align: center;">
@@ -128,7 +128,5 @@ Ask all of your recruiters to do this, using the links given by Moonlark using t
 After a _while_, both HTML and JSON will be generated in the output folder. The report will be viewable in `index.html`, and saved in `report.json` which can later be imported with `-i`.
 
 ### To-do/Unimplemented
-
-- Implement puppet filtering
 
 - Polish up the reports, especially the UI, and include additional data

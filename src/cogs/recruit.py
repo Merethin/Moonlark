@@ -30,6 +30,7 @@ class RecruitmentManager(commands.Cog):
         self.wa_queue: dict[int, deque] = {}
         self.newfound_queue: dict[int, deque] = {}
         self.refound_queue: dict[int, deque] = {}
+        self.filtering_queue = deque(maxlen=40)
         self.nation = nation
 
     @commands.Cog.listener()
@@ -103,6 +104,25 @@ class RecruitmentManager(commands.Cog):
 
         return result
     
+    def check_puppet_filter(self, nation: str) -> bool:
+        puppet_likeliness = 0
+        for other_nation in self.filtering_queue:
+            i = 0
+            for (a, b) in zip(nation,other_nation):
+                if a != b:
+                    break
+                else:
+                    i += 1
+            if i/len(nation) > puppet_likeliness:
+                puppet_likeliness = i/len(nation)
+
+        if puppet_likeliness < 0.6:
+            self.filtering_queue.append(nation)
+            return False
+        else:
+            print("Skipping likely puppet: {} is {} similar to existing nation".format(nation,puppet_likeliness))
+            return True
+    
     def select_template(self, templates: list[TGTemplate], index: int) -> tuple[int, TGTemplate]:
         tg = templates[index]
 
@@ -149,10 +169,6 @@ class RecruitmentManager(commands.Cog):
 
         if len(user_template.refound) == 0:
             do_refounds = False
-        
-        wa_index = 0
-        newfound_index = 0
-        refound_index = 0
 
         conditions = [do_wa, do_newfounds, do_refounds]
         pop_operations = [self.pop_wa_nations, self.pop_new_nations, self.pop_refound_nations]
