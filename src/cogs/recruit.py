@@ -8,8 +8,8 @@ import typing, discord, asyncio, random, time
 from dataclasses import dataclass
 from datetime import datetime
 
-WA_BACKLOG_SIZE = 8
-BACKLOG_SIZE = 16
+WA_BACKLOG_SIZE = 250
+BACKLOG_SIZE = 500
 MAX_NATIONS_PER_TG = 8
 
 class RecruiterView(discord.ui.View):
