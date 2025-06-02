@@ -111,6 +111,8 @@ To end the recruitment session, run `/stop`. As an administrator (admin role set
 
 To view recruitment stats for your server, run `/stats`. By default the command will show all-time statistics, but by passing a number `X` to the `since` parameter, it will show stats for the last `X` days.
 
+To view how many nations are currently queued for your guild, run `/queue`.
+
 People recruiting in the same server are assumed to be recruiting for the same region, and therefore nations are distributed between them.
 
 ### API script:

@@ -107,7 +107,7 @@ class StatsTracker(commands.Cog):
             heading = f"Since {start_day.day}/{start_day.month}/{start_day.year}"
 
         async def get_page(page: int):
-            emb = discord.Embed(title=f"Statistics for {interaction.guild.name}", description="")
+            emb = discord.Embed(title=f"Statistics for {interaction.guild.name}", description="", colour=0xc061cb)
             emb.set_author(name=heading)
             offset = (page-1) * ELEMENTS_PER_PAGE
             for recruiter in recruiters[offset:offset+ELEMENTS_PER_PAGE]:

@@ -288,3 +288,25 @@ class RecruitmentManager(commands.Cog):
         del self.recruiters[(interaction.guild.id, user.id)]
 
         await interaction.response.send_message(f"Recruitment task stopped.")
+
+    @app_commands.command(description="View the amount of queued nations per category.")
+    async def queue(self, interaction: discord.Interaction):
+        guilds: GuildManager = self.bot.get_cog('GuildManager')
+
+        if not await guilds.check_recruit_permissions(interaction):
+            return
+
+        wa_count = len(self.wa_queue[interaction.guild.id].nations)
+        newfound_count = len(self.newfound_queue[interaction.guild.id].nations)
+        refound_count = len(self.refound_queue[interaction.guild.id].nations)
+
+        embed = discord.Embed(title=f"Nations Queued for {interaction.guild.name}",
+                      description=f"{wa_count} New WA joins (max {WA_BACKLOG_SIZE})\n"
+                      f"{newfound_count} Newly Founded Nations (max {BACKLOG_SIZE})\n"
+                      f"{refound_count} Refounded Nations (max {BACKLOG_SIZE})\n",
+                      colour=0x1c71d8,
+                      timestamp=datetime.now())
+        
+        await interaction.response.send_message(
+            embed=embed,
+        )
