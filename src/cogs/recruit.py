@@ -40,7 +40,7 @@ class RecruitmentManager(commands.Cog):
         self.wa_queue: dict[int, Queue] = {}
         self.newfound_queue: dict[int, Queue] = {}
         self.refound_queue: dict[int, Queue] = {}
-        self.filtering_queue = deque(maxlen=40)
+        self.filtering_queue = deque(maxlen=80)
         self.nation = nation
 
     @commands.Cog.listener()
