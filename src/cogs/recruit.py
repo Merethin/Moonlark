@@ -162,11 +162,13 @@ class RecruitmentManager(commands.Cog):
                       colour=0xf8e45c,
                       timestamp=datetime.now())
         
-        await interaction.channel.send(
+        message = await interaction.channel.send(
             f"{interaction.user.mention}",
             embed=embed,
             view=view,
         )
+
+        await message.add_reaction("✅")
 
     async def recruit_task(self, interaction: discord.Interaction, interval: int, container: str | None) -> None:
         templates: TemplateManager = self.bot.get_cog('TemplateManager')
