@@ -9,6 +9,7 @@ from src.cogs.guilds import GuildManager
 from src.cogs.template import TemplateManager
 from src.cogs.nation import NationListener
 from src.cogs.recruit import RecruitmentManager
+from src.cogs.stats import StatsTracker
 
 VERSION = "0.1.0"
 
@@ -31,6 +32,7 @@ class MoonlarkBot(commands.Bot):
         await self.add_cog(TemplateManager(self))
         await self.add_cog(RecruitmentManager(self, self.nation))
         await self.add_cog(NationListener(self))
+        await self.add_cog(StatsTracker(self))
 
     async def on_ready(self):
         global nation_name
@@ -65,6 +67,14 @@ def create_tables_if_needed(connection: sqlite3.Connection):
         # User templates list doesn't exist, create it
         cursor.execute("CREATE TABLE user_templates(unique_id, guild_id, user_id, wa, newfound, refound)")
         cursor.execute("CREATE UNIQUE INDEX idx_unique_id ON user_templates (unique_id);")
+        connection.commit()
+
+    stats_list = cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='stats'; ").fetchall()
+
+    if stats_list == []:
+        # Stats list doesn't exist, create it
+        cursor.execute("CREATE TABLE stats(unique_id, guild_id, user_id, year, month, day, wa_sent, newfound_sent, refound_sent)")
+        cursor.execute("CREATE UNIQUE INDEX idx_stat_unique_id ON stats (unique_id);")
         connection.commit()
 
     cursor.close()

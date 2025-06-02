@@ -3,6 +3,7 @@ from discord import app_commands
 from collections import deque
 from .template import TGTemplate, TemplateManager
 from .guilds import GuildManager
+from .stats import StatsTracker
 import typing, discord, asyncio, random
 from datetime import datetime
 
@@ -154,6 +155,7 @@ class RecruitmentManager(commands.Cog):
     async def recruit_task(self, interaction: discord.Interaction, interval: int, container: str | None) -> None:
         templates: TemplateManager = self.bot.get_cog('TemplateManager')
         guilds: GuildManager = self.bot.get_cog('GuildManager')
+        stats: StatsTracker = self.bot.get_cog('StatsTracker')
 
         user_template = templates.user_templates[(interaction.guild.id, interaction.user.id)]
 
@@ -194,9 +196,14 @@ class RecruitmentManager(commands.Cog):
                         if len(nations) != 0:
                             (index, template) = self.select_template(user_templates[i], indexes[i])
                             indexes[i] = index
+                            
+                            sent = [0, 0, 0]
+                            sent[i] = len(nations)
 
                             await self.send_recruitment_embed(interaction, labels[i], template, nations, container)
                             message_sent = True
+
+                            stats.update_stats(interaction.guild.id, interaction.user.id, *sent)
                             break
 
                 if message_sent:
