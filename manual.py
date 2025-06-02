@@ -21,7 +21,7 @@ class MoonlarkBot(commands.Bot):
         super().__init__(command_prefix="?", intents=intents)
 
         self.db_connection = connection
-        self.nation = nation
+        self.nation = util.format_nation_or_region(nation)
 
     async def setup_hook(self):
         loop = asyncio.get_event_loop()
