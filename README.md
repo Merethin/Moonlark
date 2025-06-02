@@ -97,7 +97,7 @@ You can reuse the same telegram across multiple categories, if you don't feel li
 
 Whenever the bot joins a guild for the first time, the server owner must run `/config` to configure it.
 
-`/add` will add a telegram template (`destination` being one of `wa`, `newfound` or `refound`).
+`/add` will add a telegram template (`destination` being one of `wa`, `newfound` or `refound`). `category` is a name you can use for whatever purpose - usually each identical template will have the same category. You can use `/remove` to remove all registered templates matching a specific category.
 
 You can view registered templates for you in a specific guild by running `/templates` or clear them with `/clear`.
 
@@ -106,6 +106,8 @@ When your templates are set up, run `/recruit [DELAY]` with the delay between te
 Optionally, you can also provide a container name, if you use Containerise and want to send telegrams from a nation that isn't your main. Telegram links will automatically open in said container.
 
 To end the recruitment session, run `/stop`. 
+
+To view recruitment stats for your server, run `/stats`. By default the command will show all-time statistics, but by passing a number `X` to the `since` parameter, it will show stats for the last `X` days.
 
 People recruiting in the same server are assumed to be recruiting for the same region, and therefore nations are distributed between them.
 

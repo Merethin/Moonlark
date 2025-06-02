@@ -156,6 +156,34 @@ class TemplateManager(commands.Cog):
         
         await interaction.response.send_message("Error: destination must be one of 'wa', 'newfound' or 'refound'", ephemeral=True)
 
+    @app_commands.command(description="Remove all templates matching a specific category.")
+    async def remove(self, interaction: discord.Interaction, category: str):
+        guilds: GuildManager = self.bot.get_cog('GuildManager')
+
+        if not await guilds.check_recruit_permissions(interaction):
+            return
+
+        if (interaction.guild.id, interaction.user.id) not in self.user_templates.keys():
+            await interaction.response.send_message(f"You do not have any templates set in this guild!", ephemeral=True)
+            return
+        
+        templates = self.user_templates[(interaction.guild.id, interaction.user.id)]
+
+        removed = 0
+
+        for template_list in [templates.wa, templates.newfound, templates.refound]:
+            to_remove = []
+            for template in template_list:
+                if template.category == category:
+                    to_remove.append(template)
+
+            for template in to_remove:
+                removed += 1
+                template_list.remove(template)
+        
+        self.sync(interaction, templates)
+        await interaction.response.send_message(f"{removed} templates removed from your template list!")
+
     @app_commands.command(description="Clears your registered templates.")
     async def clear(self, interaction: discord.Interaction):
         guilds: GuildManager = self.bot.get_cog('GuildManager')
