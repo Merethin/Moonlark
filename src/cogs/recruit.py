@@ -60,7 +60,7 @@ class RecruitmentManager(commands.Cog):
     def add_new_wa(self, nation: str):
         for guild, queue in self.wa_queue.items():
             queue.nations.append(nation)
-            queue.last_update = time.time()
+            queue.last_update = time.time() + 2.5 # WA joins are way rarer (and more valuable), so they're given a bit of an advantage over newfounds and refounds just after
 
     def add_newfound(self, nation: str):
         for guild, queue in self.newfound_queue.items():
