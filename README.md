@@ -107,7 +107,7 @@ When your templates are set up, run `/recruit [DELAY]` with the delay between te
 
 Optionally, you can also provide a container name, if you use Containerise and want to send telegrams from a nation that isn't your main. Telegram links will automatically open in said container.
 
-To end the recruitment session, run `/stop`. 
+To end the recruitment session, run `/stop`. As an administrator (admin role set in `/config`), run `/forcestop` to stop another user's recruitment session, if they've left it idle for example.
 
 To view recruitment stats for your server, run `/stats`. By default the command will show all-time statistics, but by passing a number `X` to the `since` parameter, it will show stats for the last `X` days.
 

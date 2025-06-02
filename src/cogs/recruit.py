@@ -270,3 +270,21 @@ class RecruitmentManager(commands.Cog):
         del self.recruiters[(interaction.guild.id, interaction.user.id)]
 
         await interaction.response.send_message(f"Recruitment task stopped.")
+
+    @app_commands.command(description="As an administrator, stop another user's recruitment session.")
+    async def forcestop(self, interaction: discord.Interaction, user: discord.User | discord.Member):
+        guilds: GuildManager = self.bot.get_cog('GuildManager')
+
+        if not await guilds.check_admin_permissions(interaction):
+            return
+        
+        if (interaction.guild.id, user.id) not in self.recruiters.keys():
+            await interaction.response.send_message(f"The user specified is not recruiting!", ephemeral=True)
+            return
+        
+        task = self.recruiters[(interaction.guild.id, user.id)]
+        task.cancel()
+
+        del self.recruiters[(interaction.guild.id, user.id)]
+
+        await interaction.response.send_message(f"Recruitment task stopped.")

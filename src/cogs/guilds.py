@@ -54,6 +54,20 @@ class GuildManager(commands.Cog):
             return False
 
         return True
+
+    # Check if a command follows the following requirements:
+    # 1. The guild it was run in has been configured.
+    # 2. The author of the command has the Administrator Role for that guild.
+    async def check_admin_permissions(self, interaction: discord.Interaction) -> bool:
+        if interaction.guild.id not in self.guilds.keys():
+            await interaction.response.send_message("This server is not configured. Tell the owner to run /config first.", ephemeral=True)
+            return False
+
+        if interaction.user.get_role(self.guilds[interaction.guild.id].admin_role) is None:
+            await interaction.response.send_message("You are not allowed to use this command!", ephemeral=True)
+            return False
+
+        return True
     
     @app_commands.command(description="Configure the bot.")
     async def config(self, interaction: discord.Interaction, admin_role: discord.Role, recruit_role: discord.Role, recruit_wa: bool, recruit_newfounds: bool, recruit_refounds: bool):
