@@ -82,7 +82,6 @@ RECRUITMENT_DELAY = 180
 
 async def telegram_loop(event: asyncio.Event):
     limiter = sans.TelegramLimiter(recruitment=True)
-    timeout = httpx.Timeout(10.0, read=None)
 
     async with sans.AsyncClient() as client:
         while True:
@@ -94,10 +93,14 @@ async def telegram_loop(event: asyncio.Event):
 
                 template = random.choice(config.templates[category])
 
-                print(f"log: preparing telegram with ID {template.tgid} (category: {category}) for target '{nation}'")
-                response = await client.get(sans.Telegram(client=config.client, tgid=str(template.tgid), key=template.key, to=nation), auth=limiter, timeout=timeout)
+                try:
+                    print(f"log: preparing telegram with ID {template.tgid} (category: {category}) for target '{nation}'")
+                    response = await client.get(sans.Telegram(client=config.client, tgid=str(template.tgid), key=template.key, to=nation), auth=limiter)
 
-                print(f"log: telegram {template.tgid} sent to {nation}, response: {response.content.rstrip().decode("utf-8")}")
+                    print(f"log: telegram {template.tgid} sent to {nation}, response: {response.content.rstrip().decode("utf-8")}")
+
+                except httpx.ReadTimeout:
+                    print("log: response timed out, skipping this target")
 
                 print(f"log: delaying next telegram by {RECRUITMENT_DELAY} seconds")
 
