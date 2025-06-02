@@ -4,7 +4,8 @@ from collections import deque
 from .template import TGTemplate, TemplateManager
 from .guilds import GuildManager
 from .stats import StatsTracker
-import typing, discord, asyncio, random
+import typing, discord, asyncio, random, time
+from dataclasses import dataclass
 from datetime import datetime
 
 WA_BACKLOG_SIZE = 8
@@ -23,14 +24,22 @@ class RecruiterView(discord.ui.View):
             return True
         await interaction.response.send_message(f"The command was initiated by {self.user.mention}", ephemeral=True)
         return False
+    
+@dataclass
+class Queue:
+    nations: deque
+    last_update: float
+
+    def create(maxlen: int):
+        return Queue(deque(maxlen=maxlen), 0)
 
 class RecruitmentManager(commands.Cog):
     def __init__(self, bot: commands.Bot, nation: str):
         self.bot = bot
         self.recruiters: dict[tuple[int, int], typing.Awaitable[None]] = {}
-        self.wa_queue: dict[int, deque] = {}
-        self.newfound_queue: dict[int, deque] = {}
-        self.refound_queue: dict[int, deque] = {}
+        self.wa_queue: dict[int, Queue] = {}
+        self.newfound_queue: dict[int, Queue] = {}
+        self.refound_queue: dict[int, Queue] = {}
         self.filtering_queue = deque(maxlen=40)
         self.nation = nation
 
@@ -42,34 +51,35 @@ class RecruitmentManager(commands.Cog):
         for guild in self.bot.guilds:
             print(f"Updating backlog queues for guild {guild.name}")
             if guild.id not in self.wa_queue.keys():
-                self.wa_queue[guild.id] = deque(maxlen=WA_BACKLOG_SIZE)
+                self.wa_queue[guild.id] = Queue.create(WA_BACKLOG_SIZE)
             if guild.id not in self.newfound_queue.keys():
-                self.newfound_queue[guild.id] = deque(maxlen=BACKLOG_SIZE)
+                self.newfound_queue[guild.id] = Queue.create(BACKLOG_SIZE)
             if guild.id not in self.refound_queue.keys():
-                self.refound_queue[guild.id] = deque(maxlen=BACKLOG_SIZE)
+                self.refound_queue[guild.id] = Queue.create(BACKLOG_SIZE)
 
     def add_new_wa(self, nation: str):
         for guild, queue in self.wa_queue.items():
-            queue.append(nation)
+            queue.nations.append(nation)
+            queue.last_update = time.time()
 
     def add_newfound(self, nation: str):
         for guild, queue in self.newfound_queue.items():
-            queue.append(nation)
+            queue.nations.append(nation)
+            queue.last_update = time.time()
 
     def add_refound(self, nation: str):
         for guild, queue in self.refound_queue.items():
-            queue.append(nation)
+            queue.nations.append(nation)
+            queue.last_update = time.time()
 
     def pop_wa_nations(self, guild: int, max: int) -> list[str]:
         result = []
-        queue = self.wa_queue.get(guild)
-        if queue is None:
-            queue = deque(maxlen=WA_BACKLOG_SIZE)
-            self.wa_queue[guild] = queue
+        queue = self.wa_queue[guild]
 
         for i in range(max):
-            if queue:
-                result.append(queue.pop())
+            if queue.nations:
+                result.append(queue.nations.pop())
+                queue.last_update = 0
             else:
                 break
 
@@ -77,14 +87,12 @@ class RecruitmentManager(commands.Cog):
     
     def pop_new_nations(self, guild: int, max: int) -> list[str]:
         result = []
-        queue = self.newfound_queue.get(guild)
-        if queue is None:
-            queue = deque(maxlen=BACKLOG_SIZE)
-            self.newfound_queue[guild] = queue
+        queue = self.newfound_queue[guild]
 
         for i in range(max):
-            if queue:
-                result.append(queue.pop())
+            if queue.nations:
+                result.append(queue.nations.pop())
+                queue.last_update = 0
             else:
                 break
 
@@ -92,18 +100,26 @@ class RecruitmentManager(commands.Cog):
 
     def pop_refound_nations(self, guild: int, max: int) -> list[str]:
         result = []
-        queue = self.refound_queue.get(guild)
-        if queue is None:
-            queue = deque(maxlen=BACKLOG_SIZE)
-            self.refound_queue[guild] = queue
+        queue = self.refound_queue[guild]
 
         for i in range(max):
-            if queue:
-                result.append(queue.pop())
+            if queue.nations:
+                result.append(queue.nations.pop())
+                queue.last_update = 0
             else:
                 break
 
         return result
+    
+    # Sort the nation queues by last update in descending order, and return the corresponding ordered indexes (0 for WA, 1 for Newfounds, 2 for Refounds)
+    # As an example, if the most recently updated queue is the Newfound one, then the WA one, and the Refound one hasn't been updated:
+    # The function would return [1, 0, 2]
+    def sort_queues(self, guild: int) -> list[int]:
+        queues = [(0, self.wa_queue[guild].last_update), (1, self.newfound_queue[guild].last_update), (2, self.refound_queue[guild].last_update)]
+
+        queues.sort(reverse=True, key=lambda v: v[1])
+
+        return [v[0] for v in queues]
     
     def check_puppet_filter(self, nation: str) -> bool:
         puppet_likeliness = 0
@@ -172,6 +188,8 @@ class RecruitmentManager(commands.Cog):
         if len(user_template.refound) == 0:
             do_refounds = False
 
+        # Data associated with each queue. Index 0 is for WA, index 1 for Newfound, index 2 for Refound.
+        # Stored like this so we can operate on the queues in any given order, preferably the one given by self.sort_queues().
         conditions = [do_wa, do_newfounds, do_refounds]
         pop_operations = [self.pop_wa_nations, self.pop_new_nations, self.pop_refound_nations]
         user_templates = [user_template.wa, user_template.newfound, user_template.refound]
@@ -185,8 +203,7 @@ class RecruitmentManager(commands.Cog):
             await asyncio.sleep(interval)
 
             while True:
-                # Randomize order
-                order = random.sample(range(3), 3)
+                order = self.sort_queues(interaction.guild.id)
 
                 message_sent = False
 

@@ -1,6 +1,5 @@
-import discord, typing, sqlite3, sans, argparse, sys, asyncio
+import discord, sqlite3, sans, argparse, sys, asyncio
 from discord.ext import commands
-from dataclasses import dataclass
 from dotenv import dotenv_values
 import utility as util
 
@@ -43,12 +42,6 @@ class MoonlarkBot(commands.Bot):
             print(f"Synced {len(synced)} slash commands")
         except Exception as e:
             print(f"Error syncing commands: {e}")
-
-
-# Stores settings and templates for a guild.
-@dataclass
-class Guild:
-    recruiters: list[typing.Awaitable[None]] # Currently active recruiters and their sessions
 
 def create_tables_if_needed(connection: sqlite3.Connection):
     cursor = connection.cursor()
