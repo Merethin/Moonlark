@@ -99,6 +99,8 @@ Whenever the bot joins a guild for the first time, the server owner must run `/c
 
 `/add` will add a telegram template (`destination` being one of `wa`, `newfound` or `refound`). `category` is a name you can use for whatever purpose - usually each identical template will have the same category. You can use `/remove` to remove all registered templates matching a specific category.
 
+Alternatively, running `/setup` will simply add a "generic" template for all three destinations. This is the preferred command to use if you don't want to use multiple templates and/or change templates depending on whether the nation being recruited is a new WA join, newfound or refound. And it's easier to explain to your new recruiters.
+
 You can view registered templates for you in a specific guild by running `/templates` or clear them with `/clear`.
 
 When your templates are set up, run `/recruit [DELAY]` with the delay between telegrams. This will depend on your nation age - younger nations may need up to a 2 minute cooldown, while older ones can conform themselves with 1 minute. There is a Dot command to check this (`/timer`). 

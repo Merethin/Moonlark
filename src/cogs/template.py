@@ -156,6 +156,33 @@ class TemplateManager(commands.Cog):
         
         await interaction.response.send_message("Error: destination must be one of 'wa', 'newfound' or 'refound'", ephemeral=True)
 
+    @app_commands.command(description="Set up a new generic template for all three destinations.")
+    async def setup(self, interaction: discord.Interaction, tgid: str):
+        guilds: GuildManager = self.bot.get_cog('GuildManager')
+
+        if not await guilds.check_recruit_permissions(interaction):
+            return
+
+        if (interaction.guild.id, interaction.user.id) not in self.user_templates.keys():
+            self.user_templates[(interaction.guild.id, interaction.user.id)] = UserTemplates([], [], [])
+        
+        templates = self.user_templates[(interaction.guild.id, interaction.user.id)]
+
+        template = TGTemplate()
+        template.category = "generic"
+        match = re.match(r"%TEMPLATE\-([0-9]+)%", tgid)
+        if match is not None:
+            template.tgid = int(match.groups()[0])
+        else:
+            await interaction.response.send_message("Template ID is invalid!", ephemeral=True)
+            return
+
+        templates.wa.append(template)
+        templates.newfound.append(template)
+        templates.refound.append(template)
+        self.sync(interaction, templates)
+        await interaction.response.send_message("Template set up successfully!")
+
     @app_commands.command(description="Remove all templates matching a specific category.")
     async def remove(self, interaction: discord.Interaction, category: str):
         guilds: GuildManager = self.bot.get_cog('GuildManager')
