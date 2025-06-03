@@ -87,7 +87,7 @@ class StatsTracker(commands.Cog):
                     name = f"{member.name}"
 
                 if name not in recruiter_dict.keys():
-                    recruiter_dict[name] = (stat.wa_sent+stat.newfound_sent+stat.refound_sent, stat.wa_sent, stat.newfound_sent, stat.refound_sent)
+                    recruiter_dict[name] = [stat.wa_sent+stat.newfound_sent+stat.refound_sent, stat.wa_sent, stat.newfound_sent, stat.refound_sent]
                 else:
                     recruiter_dict[name][0] += stat.wa_sent+stat.newfound_sent+stat.refound_sent
                     recruiter_dict[name][1] += stat.wa_sent
