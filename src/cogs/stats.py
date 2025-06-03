@@ -71,7 +71,7 @@ class StatsTracker(commands.Cog):
         if since is not None:
             start_day = date.today() - timedelta(days=since)
         
-        recruiters = []
+        recruiter_dict = {}
 
         for (guild_id, user_id, day), stat in self.stat_map.items():
             if guild_id == interaction.guild.id:
@@ -86,7 +86,15 @@ class StatsTracker(commands.Cog):
                 else:
                     name = f"{member.name}"
 
-                recruiters.append((name, stat.wa_sent+stat.newfound_sent+stat.refound_sent, stat.wa_sent, stat.newfound_sent, stat.refound_sent))
+                if name not in recruiter_dict.keys():
+                    recruiter_dict[name] = (stat.wa_sent+stat.newfound_sent+stat.refound_sent, stat.wa_sent, stat.newfound_sent, stat.refound_sent)
+                else:
+                    recruiter_dict[name][0] += stat.wa_sent+stat.newfound_sent+stat.refound_sent
+                    recruiter_dict[name][1] += stat.wa_sent
+                    recruiter_dict[name][2] += stat.newfound_sent
+                    recruiter_dict[name][3] += stat.refound_sent
+
+        recruiters = [(name, total, wa, newfound, refound) for (name, (total, wa, newfound, refound)) in recruiter_dict.items()]
 
         # Sort by total telegrams sent
         recruiters.sort(reverse=True, key=lambda a: a[1])
