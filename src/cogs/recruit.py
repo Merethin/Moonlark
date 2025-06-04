@@ -137,7 +137,7 @@ class RecruitmentManager(commands.Cog):
             self.filtering_queue.append(nation)
             return False
         else:
-            print("Skipping likely puppet: {} is {} similar to existing nation".format(nation,puppet_likeliness))
+            print("log: skipping likely puppet {}, who is {} similar to existing nation".format(nation,puppet_likeliness))
             return True
     
     def select_template(self, templates: list[TGTemplate], index: int) -> tuple[int, TGTemplate]:
