@@ -28,8 +28,9 @@ class RecruiterView(discord.ui.View):
 @dataclass
 class Queue:
     nations: deque
+
     def create(maxlen: int):
-        return Queue(deque(maxlen=maxlen), 0)
+        return Queue(deque(maxlen=maxlen))
     
     def last_update(self):
         if self.nations:
