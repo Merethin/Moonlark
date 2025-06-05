@@ -16,11 +16,11 @@ Must be no ordinary bird, then...
 Welcome to <b>Moonlark</b> - the bird that delivers your NationStates recruitment telegrams.</p>
 
 <p style="text-align: center;">
-<b>Moonlark</b> is an all-in-one suite for NS recruitment - including two recruitment clients, one API script and one Discord bot for manual telegramming - both powered by server-sent events to deliver your telegrams almost as soon as nations are founded, with puppet filtering so that you can telegram the nations that actually matter.
+<b>Moonlark</b> is an all-in-one suite for NS recruitment - with a recruitment client that features API recruitment and manual telegramming via a Discord bot - both powered by server-sent events to deliver your telegrams almost as soon as nations are founded, with puppet filtering so that you can telegram the nations that actually matter.
 </p>
 
 <p style="text-align: center;">
-With little effort on your part (besides writing the telegrams), Moonlark will mix and match as many templates as you can throw at it - three for new WA joins, three for newly founded nations, and three for refounds? No problem, both the API and manual clients will alternate between templates depending on the nation's origin, providing A/B telegram testing by default.
+With little effort on your part (besides writing the telegrams), Moonlark will mix and match as many templates as you can throw at it - three for new WA joins, three for newly founded nations, and three for refounds? No problem, both the API and manual endpoints will alternate between templates depending on the nation's origin, providing A/B telegram testing by default.
 </p>
 
 <p style="text-align: center;">
@@ -49,37 +49,17 @@ For the Discord bot, you'll want to create an app on the developer dashboard, an
 
 `TOKEN = "[REDACTED]"`
 
-For the API script, you'll want to create a JSON file, naming it `api.json` for example, with the following format:
+For API recruitment, once you've set up the bot, you'll want to run the following commands:
 
-```
-{
-    "client": "[CLIENT-KEY]",
-    "wa": [
-        {
-            "tgid": XXXXXXXX,
-            "key": "[SECRET-KEY-X]"
-        }
-    ],
-    "newfound": [
-        {
-            "tgid": YYYYYYYY,
-            "key": "[SECRET-KEY-Y]"
-        }
-    ],
-    "refound": [
-        {
-            "tgid": ZZZZZZZZ,
-            "key": "[SECRET-KEY-Z]"
-        }
-    ]
-}
-```
+`/apiguild` to assign the guild which will be sharing new nations with the API recruiter (so that manual recruiters don't telegram the same nations as the API).
+
+`/apiclient <client>` to set the client key.
 
 The `client` key is the API key that's obtained when contacting the NationStates mods.
 
-Each telegram, when sent to `tag:template` (make sure to check the recruitment box), will give you a template ID and a secret key, those are the `tgid` and `key` fields respectively.
+Then, you'll have to create the telegram templates:
 
-As an example, there's one template per category, but you can add more.
+Each telegram, when sent to `tag:template` (make sure to check the recruitment box), will give you a template ID and a secret key, those are the `tgid` and `key` fields respectively.
 
 New WA joins will get one random telegram from the `wa` category.
 
@@ -89,11 +69,15 @@ Refounded nations will get one random telegram from the `refound` category.
 
 You can reuse the same telegram across multiple categories, if you don't feel like writing different telegrams.
 
+To add an API telegram, run `/apiadd` (for a specific destination/category), or `/apisetup` (to create a generic telegram for all the above destinations).
+
+Then, start API recruitment with `/apistart`. After this, whenever you restart the bot, API recruitment will resume automatically. You can check how it's going with `/apistatus`.
+
+All commands prefixed with `/api` can only be run by the bot owner. This is because unlike the manual recruitment part of Moonlark, API recruitment can only be done for one guild per bot instance, therefore we leave it up to the bot owner to choose which one they'd like to set up.
+
 ## Usage
 
-### Discord bot:
-
-`python manual.py -n [YOUR_NATION_NAME]`
+`python moonlark.py -n [YOUR_NATION_NAME]`
 
 Whenever the bot joins a guild for the first time, the server owner must run `/config` to configure it.
 
@@ -114,12 +98,6 @@ To view recruitment stats for your server, run `/stats`. By default the command 
 To view how many nations are currently queued for your guild, run `/queue`.
 
 People recruiting in the same server are assumed to be recruiting for the same region, and therefore nations are distributed between them.
-
-### API script:
-
-`python api.py -n [YOUR_NATION_NAME] api.json`
-
-After you've configured the API settings in `api.json`, this is all you have to do.
 
 ### Report generation:
 

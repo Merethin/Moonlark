@@ -28,10 +28,14 @@ class RecruiterView(discord.ui.View):
 @dataclass
 class Queue:
     nations: deque
-    last_update: float
-
     def create(maxlen: int):
         return Queue(deque(maxlen=maxlen), 0)
+    
+    def last_update(self):
+        if self.nations:
+            return self.nations[-1][1]
+        else:
+            return 0
 
 class RecruitmentManager(commands.Cog):
     def __init__(self, bot: commands.Bot, nation: str):
@@ -46,6 +50,7 @@ class RecruitmentManager(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.update_backlog()
+        self.bot.dispatch('backlog_ready')
 
     def update_backlog(self):
         for guild in self.bot.guilds:
@@ -59,18 +64,15 @@ class RecruitmentManager(commands.Cog):
 
     def add_new_wa(self, nation: str):
         for guild, queue in self.wa_queue.items():
-            queue.nations.append(nation)
-            queue.last_update = time.time() + 2.5 # WA joins are way rarer (and more valuable), so they're given a bit of an advantage over newfounds and refounds just after
+            queue.nations.append((nation, time.time() + 2.5)) # WA joins are way rarer (and more valuable), so they're given a bit of an advantage over newfounds and refounds just after
 
     def add_newfound(self, nation: str):
         for guild, queue in self.newfound_queue.items():
-            queue.nations.append(nation)
-            queue.last_update = time.time()
+            queue.nations.append((nation, time.time()))
 
     def add_refound(self, nation: str):
         for guild, queue in self.refound_queue.items():
-            queue.nations.append(nation)
-            queue.last_update = time.time()
+            queue.nations.append((nation, time.time()))
 
     def pop_wa_nations(self, guild: int, max: int) -> list[str]:
         result = []
@@ -78,8 +80,8 @@ class RecruitmentManager(commands.Cog):
 
         for i in range(max):
             if queue.nations:
-                result.append(queue.nations.pop())
-                queue.last_update = 0
+                (nation, time) = queue.nations.pop()
+                result.append(nation)
             else:
                 break
 
@@ -91,8 +93,8 @@ class RecruitmentManager(commands.Cog):
 
         for i in range(max):
             if queue.nations:
-                result.append(queue.nations.pop())
-                queue.last_update = 0
+                (nation, time) = queue.nations.pop()
+                result.append(nation)
             else:
                 break
 
@@ -104,8 +106,8 @@ class RecruitmentManager(commands.Cog):
 
         for i in range(max):
             if queue.nations:
-                result.append(queue.nations.pop())
-                queue.last_update = 0
+                (nation, time) = queue.nations.pop()
+                result.append(nation)
             else:
                 break
 
@@ -115,7 +117,7 @@ class RecruitmentManager(commands.Cog):
     # As an example, if the most recently updated queue is the Newfound one, then the WA one, and the Refound one hasn't been updated:
     # The function would return [1, 0, 2]
     def sort_queues(self, guild: int) -> list[int]:
-        queues = [(0, self.wa_queue[guild].last_update), (1, self.newfound_queue[guild].last_update), (2, self.refound_queue[guild].last_update)]
+        queues = [(0, self.wa_queue[guild].last_update()), (1, self.newfound_queue[guild].last_update()), (2, self.refound_queue[guild].last_update())]
 
         queues.sort(reverse=True, key=lambda v: v[1])
 

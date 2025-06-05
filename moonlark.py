@@ -9,6 +9,7 @@ from src.cogs.template import TemplateManager
 from src.cogs.nation import NationListener
 from src.cogs.recruit import RecruitmentManager
 from src.cogs.stats import StatsTracker
+from src.cogs.api import APIRecruiter
 
 VERSION = "0.1.0"
 
@@ -32,6 +33,7 @@ class MoonlarkBot(commands.Bot):
         await self.add_cog(RecruitmentManager(self, self.nation))
         await self.add_cog(NationListener(self))
         await self.add_cog(StatsTracker(self))
+        await self.add_cog(APIRecruiter(self))
 
     async def on_ready(self):
         global nation_name

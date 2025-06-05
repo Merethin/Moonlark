@@ -16,7 +16,7 @@ class NationListener(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.sse_task = asyncio.create_task(self.sse_loop())
-        
+
     async def sse_loop(self):
         recruiter: RecruitmentManager = self.bot.get_cog('RecruitmentManager')
 
