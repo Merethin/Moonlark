@@ -59,7 +59,7 @@ The `client` key is the API key that's obtained when contacting the NationStates
 
 Then, you'll have to create the telegram templates:
 
-Each telegram, when sent to `tag:template` (make sure to check the recruitment box), will give you a template ID and a secret key, those are the `tgid` and `key` fields respectively.
+Each telegram, when sent to `tag:api` (make sure to check the recruitment box), will give you a template ID and a secret key, those are the `tgid` and `key` fields respectively.
 
 New WA joins will get one random telegram from the `wa` category.
 
