@@ -21,70 +21,73 @@ class NationListener(commands.Cog):
         recruiter: RecruitmentManager = self.bot.get_cog('RecruitmentManager')
 
         client = sans.AsyncClient()
-        async for event in sans.serversent_events(client, "founding", "member", "move"):
-            match = FOUND_REGEX.match(event["str"])
-            if match is not None:
-                groups = match.groups()
-                nation = groups[0]
+        while True:
+            async for event in sans.serversent_events(client, "founding", "member", "move"):
+                match = FOUND_REGEX.match(event["str"])
+                if match is not None:
+                    groups = match.groups()
+                    nation = groups[0]
 
-                if recruiter.check_puppet_filter(nation):
+                    if recruiter.check_puppet_filter(nation):
+                        continue
+
+                    if groups[1] == 'founded':
+                        recruiter.add_newfound(nation)
+                    else:
+                        skip = False
+                        response = await client.get(sans.Nation(nation, 'tgcanrecruit'))
+                        for item in response.iter_xml():
+                            if item.tag == 'TGCANRECRUIT':
+                                if int(item.text) == 0:
+                                    print(f"log: skipping refounded nation {nation} as it has recruitment telegrams turned off")
+                                    skip = True
+                                    break
+
+                        if skip:
+                            continue
+
+                        recruiter.add_refound(nation)
+
+                    self.bot.dispatch('new_recruit', nation)
+
+                    print(f"log: {nation} was {groups[1]} in {groups[2]}")
                     continue
 
-                if groups[1] == 'founded':
-                    recruiter.add_newfound(nation)
-                else:
+                match = WA_JOIN_REGEX.match(event["str"])
+                if match is not None:
+                    groups = match.groups()
+                    nation = groups[0]
+                    
+                    if recruiter.check_puppet_filter(nation):
+                        continue
+
                     skip = False
-                    response = await client.get(sans.Nation(nation, 'tgcanrecruit'))
+                    response = await client.get(sans.Nation(nation, 'region', 'tgcanrecruit', 'population'))
                     for item in response.iter_xml():
                         if item.tag == 'TGCANRECRUIT':
                             if int(item.text) == 0:
-                                print(f"log: skipping refounded nation {nation} as it has recruitment telegrams turned off")
+                                print(f"log: skipping new wa nation {nation} as it has recruitment telegrams turned off")
+                                skip = True
+                                break
+                        if item.tag == 'POPULATION':
+                            if int(item.text) > 500:
+                                print(f"log: skipping new wa nation {nation} as it has over 500 million population")
+                                skip = True
+                                break
+                        if item.tag == 'REGION':
+                            if util.format_nation_or_region(item.text) in JUMP_POINT_LIST:
+                                print(f"log: skipping new wa nation {nation} as it is in a known jump point ({item.text})")
                                 skip = True
                                 break
 
                     if skip:
                         continue
 
-                    recruiter.add_refound(nation)
+                    recruiter.add_new_wa(nation)
 
-                self.bot.dispatch('new_recruit', nation)
+                    self.bot.dispatch('new_recruit', nation)
 
-                print(f"log: {nation} was {groups[1]} in {groups[2]}")
-                continue
-
-            match = WA_JOIN_REGEX.match(event["str"])
-            if match is not None:
-                groups = match.groups()
-                nation = groups[0]
-                
-                if recruiter.check_puppet_filter(nation):
+                    print(f"log: {nation} joined the World Assembly")
                     continue
-
-                skip = False
-                response = await client.get(sans.Nation(nation, 'region', 'tgcanrecruit', 'population'))
-                for item in response.iter_xml():
-                    if item.tag == 'TGCANRECRUIT':
-                        if int(item.text) == 0:
-                            print(f"log: skipping new wa nation {nation} as it has recruitment telegrams turned off")
-                            skip = True
-                            break
-                    if item.tag == 'POPULATION':
-                        if int(item.text) > 500:
-                            print(f"log: skipping new wa nation {nation} as it has over 500 million population")
-                            skip = True
-                            break
-                    if item.tag == 'REGION':
-                        if util.format_nation_or_region(item.text) in JUMP_POINT_LIST:
-                            print(f"log: skipping new wa nation {nation} as it is in a known jump point ({item.text})")
-                            skip = True
-                            break
-
-                if skip:
-                    continue
-
-                recruiter.add_new_wa(nation)
-
-                self.bot.dispatch('new_recruit', nation)
-
-                print(f"log: {nation} joined the World Assembly")
-                continue
+            
+            print("log: SSE disconnected, attempting to reconnect")
