@@ -1,5 +1,5 @@
-from discord.ext import commands
-import sans, asyncio, re
+from discord.ext import commands, tasks
+import sans, asyncio, re, time
 from .recruit import RecruitmentManager
 import utility as util
 
@@ -16,13 +16,24 @@ class NationListener(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.sse_task = asyncio.create_task(self.sse_loop())
+        self.last_event = time.time()
+        self.check_stale_loop.start()
+
+    @tasks.loop(minutes=5)
+    async def check_stale_loop(self):
+        current_time = time.time()
+        if (current_time - self.last_event) > 300:
+            print("No SSE events in the last 5 minutes, restarting connection.")
+            self.sse_task.cancel()
+            self.sse_task = asyncio.create_task(self.sse_loop())
 
     async def sse_loop(self):
         recruiter: RecruitmentManager = self.bot.get_cog('RecruitmentManager')
 
         client = sans.AsyncClient()
         while True:
-            async for event in sans.serversent_events(client, "founding", "member", "move"):
+            async for event in sans.serversent_events(client, "founding", "member"):
+                self.last_event = time.time()
                 match = FOUND_REGEX.match(event["str"])
                 if match is not None:
                     groups = match.groups()
